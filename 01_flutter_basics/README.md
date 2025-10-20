@@ -127,13 +127,13 @@ When you write:
 
 you’re creating a Widget, but widgets are immutable blueprints — they describe what the UI should look like.
 
-## Flutter builds three parallel trees internally:
+Flutter builds three parallel trees internally:
 
-| **Tree**         | **Purpose**                              | **Type**          | **Mutable?** |
+| **Tree**         | **Purpose**                               | **Type**          | **Mutable?** |
 |------------------|-------------------------------------------|-------------------|--------------|
-| Widget Tree      | Blueprint / configuration                 | Dart objects      | ❌ Immutable |
-| Element Tree     | Connection between widget and render      | Bridge objects    | ✅ Mutable   |
-| Render Tree      | Actual layout, paint, compositing         | Render objects    | ✅ Mutable   |
+| Widget Tree      | Blueprint / configuration                 | Dart objects      |    Immutable |
+| Element Tree     | Connection between widget and render      | Bridge objects    |    Mutable   |
+| Render Tree      | Actual layout, paint, compositing         | Render objects    |    Mutable   |
 
 ## The Lifecycle
 
