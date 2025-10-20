@@ -142,3 +142,91 @@ Flutter builds three parallel trees internally:
 - Each Element holds a RenderObject that calculates layout and paints visuals
 - When something changes (like state), only affected widgets rebuild → the element updates → render object repaints efficiently
 - This separation gives Flutter its incredible speed and reactivity.
+
+---
+
+# Lesson 4 — The Rendering Process (Under the Hood of Flutter’s UI Engine)
+
+## Overview of the Rendering Flow
+
+Here’s the journey of a frame in Flutter (happening 60+ times per second):
+
+Your Code → Widget Tree → Element Tree → Render Tree
+↓
+Layout Phase
+↓
+Painting Phase
+↓
+Layer Tree (Composited)
+↓
+Skia Engine (Rasterization)
+↓
+GPU (Draws Pixels)
+
+
+Let’s unpack this in detail.
+
+## Step 1: Layout Phase
+
+The Render Tree is traversed to measure and position each render object on the screen.
+
+Each widget asks its parent:
+
+- “How much space can I have?”
+- Then tells its children: “Here’s how much space you get.”
+
+This creates a layout pass that defines every pixel’s position.
+
+**Output:** Each RenderObject now knows its exact size and coordinates.
+
+## Step 2: Painting Phase
+
+Once layout is complete, Flutter asks every render object to paint itself onto a canvas.
+
+Examples:
+
+- `RenderParagraph` → draws text  
+- `RenderDecoratedBox` → draws background  
+- `RenderImage` → draws image bitmap  
+
+These drawing commands go into Paint objects, but not to the screen yet. They are drawn into a **Layer Tree**.
+
+## Step 3: The Layer Tree (Compositing)
+
+The Layer Tree is an optimized representation of the visual scene.
+
+- Each widget’s render output goes on its own layer  
+- Layers can be transformed (translated, rotated, faded)  
+- Only changed layers are redrawn, which improves performance  
+
+This tree is handed to the Flutter Engine (C++) for rasterization.
+
+## Step 4: Skia Engine — Rasterization
+
+Skia, Google’s 2D graphics engine, takes vector commands (shapes, text, colors, gradients) and converts them into raster pixels.
+
+- These pixels are then sent to the GPU for drawing  
+- This process happens inside the Flutter Engine (C++)  
+- Each frame is drawn in under 16ms for smooth 60 FPS (or 8ms for 120 FPS)
+
+## Step 5: GPU & Compositor
+
+The GPU executes Skia’s draw commands to paint on the framebuffer — the actual pixels visible on the screen.
+
+- Android → Skia → OpenGL/Vulkan  
+- iOS → Skia → Metal  
+- Web → CanvasKit (WebAssembly version of Skia)
+
+## Step 6: Frame Scheduling
+
+Flutter uses a **Frame Scheduler** inside the engine:
+
+- The framework triggers a new frame (e.g., `setState`, animations)  
+- The engine requests the GPU to render a frame  
+- The next frame is synced to the display’s vsync signal  
+
+Result: smooth, buttery animations.
+
+---
+
+
